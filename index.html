@@ -43,6 +43,83 @@ code {
 <div class="container">
   <h1>WABM</h1>
   <p>A web hosted Agent Based Model</p> 
+  <div class="card">
+  <div class="card-header">Objectives</div>
+  <div class="card-body">
+      <p>The objectives of this project is to create a agent based modeling platform delivered via web server and web page. The agent based model and the server for its delivery are written in python.</p>
+     <p>Flask is used as the server “microframework”.</p>
+    <p>This project will be built up over a series of steps.</p>
+    <ul>
+        <il>Step 1: Single agent</il>
+    </ul>
+  </div> 
+</div>
+
+  <div class="card">
+  <div class="card-header">Single Agent</div>
+  <div class="card-body">
+      <p>The single agent code create a single agent that has the attributes xPos and yPos. at each iteration the agents position is randomly updated in both the xPos and yPos by a random integer value between 1 and - 1. This models Brownian motion.</p>
+      <p>The agent is an instance of a bespoke Agent class. The iterations of the model are run via a Python thread. </p>
+      <pre>          
+        <code>
+      
+class AgentThread (threading.Thread):
+    def __init__(self, agent):
+        threading.Thread.__init__(self)
+        self.agent = agent
+        self.counter = 0
+    
+    def run(self):
+        self.iterate()
+            
+            
+    def iterate(self):
+        while self.agent.run:
+            self.agent.move()
+
+    </code>
+    </pre>
+    
+            
+      <p>The thread is started from with in a Flask server. The server acts as both as a restful interface and to serve up the initial web page. This page has to be stored in a sub-directory templates.</p>
+      <pre>          
+        <code>
+@app.route("/")
+    def index():
+    return render_template('WABM.html')
+        </code>
+    </pre>
+    <p>With in the page local javascript files are called. These static files have to be addressed from with in the Flask server </p>
+          <pre>          
+        <code>
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory('js', path)
+        </code>
+    </pre>
+    <p>The current position of the agent can be obtained from the server via a Get request. Because the server is call directly via a port data has to be sent and recived using jsonp </p>
+    <pre>          
+        <code>
+    
+$.ajax({
+  url: "http://192.168.0.17:5000/getupdate",
+  // The name of the callback parameter, as specified by the YQL service
+  jsonp: "callback",
+  // Tell jQuery we're expecting JSONP
+  dataType: "jsonp",
+  // Tell what type of call
+  type:'GET',
+  data: {
+    company_number: 7
+  },
+});
+        </pre>          
+    </code>
+
+   </div> 
+</div>
+
+
   <pre>          
   <code>
 from flask import Flask,request,render_template,send_from_directory
@@ -92,7 +169,7 @@ class Agent:
 app = Flask(__name__)
 
 @app.route("/")
-def hello():
+def index():
     return render_template('WABM.html')
 
 @app.route('/js/<path:path>')

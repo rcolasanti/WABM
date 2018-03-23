@@ -1,7 +1,9 @@
 
 from flask import Flask,request,render_template,send_from_directory
+from flask_socketio import SocketIO, emit
 from flask_jsonpify import jsonpify
 import threading,webbrowser
+import json
 import time
 from random import randint
 
@@ -19,8 +21,9 @@ class AgentThread (threading.Thread):
             
     def iterate(self):
         while self.agent.run:
-            time.sleep(0.5)
+            time.sleep(3)
             self.agent.move()
+            socketio.emit('message',json.dumps(agent.getPos()),namespace='/test')
             self.counter+=1
 
 
@@ -44,10 +47,11 @@ class Agent:
 
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 @app.route("/")
 def index():
-    return render_template('WABM.html')
+    return render_template('WABM02.html')
 
 @app.route('/js/<path:path>')
 def send_js(path):
@@ -55,7 +59,15 @@ def send_js(path):
 
 @app.route('/getupdate', methods=['GET'])
 def getUpdate():
+    print("GET")
     return  jsonpify(agent.getPos())
+
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    print("here")
+    emit('message', {'data': 'Connected'})
+
 
         
 if __name__ == "__main__":
@@ -63,5 +75,6 @@ if __name__ == "__main__":
     thread1 = AgentThread(agent)
     thread1.start()
     #webbrowser.open("http://192.168.0.17:5000")
-    app.run(host='0.0.0.0', port=5000,debug=True)
+    #app.run( port=5000,debug=True)
+    socketio.run(app,host='0.0.0.0',port=5000,debug=True)
     
