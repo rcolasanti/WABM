@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <!--
-   untitled.html
+   WABM.html
    
    Copyright 2018  <pi@raspberrypi>
    
@@ -31,89 +31,15 @@
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 
-<style>
-code { 
-    font-family: monospace;
-}
-</style>
+
 </head>
 
 <body>
 
 <div class="container">
   <h1>WABM</h1>
-  <p>A web hosted Agent Based Model</p> 
-  <pre>          
-  <code>
-from flask import Flask,request,render_template,send_from_directory
-from flask_jsonpify import jsonpify
-import threading
-import time
-from random import randint
-
-
-class AgentThread (threading.Thread):
-    def __init__(self, agent):
-        threading.Thread.__init__(self)
-        self.agent = agent
-        self.counter = 0
-    
-    def run(self):
-        self.iterate()
-        print("done #2")
-            
-            
-    def iterate(self):
-        while self.agent.run:
-            time.sleep(0.5)
-            self.agent.move()
-            self.counter+=1
-
-
-class Agent:
-    agentCount = 0
-    run = True
-
-    def __init__(self, xPos,yPos):
-        self.xPos =xPos 
-        self.yPos =yPos 
-        Agent.agentCount+=1
-        
-   
-    def move(self):
-        self.xPos+=randint(-1, 1)
-        self.yPos+=randint(-1, 1)
-     
-    def getPos(self):
-        return(self.xPos,self.yPos)
-        
-
-
-app = Flask(__name__)
-
-@app.route("/")
-def hello():
-    return render_template('WABM.html')
-
-@app.route('/js/<path:path>')
-def send_js(path):
-    return send_from_directory('js', path)
-
-@app.route('/getupdate', methods=['GET'])
-def getUpdate():
-    return  jsonpify(agent.getPos())
-
-        
-if __name__ == "__main__":
-    agent = Agent(0,0)
-    thread1 = AgentThread(agent)
-    thread1.start()
-
-    app.run(host='0.0.0.0', port=5000,debug=True)
- 
-  
-  </code>
-  </pre>
+  <p>A web hosted Agent Based Model</p>   
+  <button id="getupdate" type="button" class="btn">GET</button>       
 </div>
 
 
@@ -123,6 +49,8 @@ if __name__ == "__main__":
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- Main JavaScript -->
+<script src="../js/main.js"></script>
 </body>
 
 </html>
